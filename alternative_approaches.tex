@@ -1,0 +1,35 @@
+\subsection{DNS-based Authentication of Name Entities(DANE)}
+Domain name authentication if a fundamental function for Internet security. In order for applications that communicate over the intertnet to protect their communication from eavesdropping, tampering or forgery, they need to make sure that the entity on the end point of a secure communcation actually reoresents the domain that the user intended to connect to. The Domain Name System Security Extentions (DNSSEC) provides an alternative path for distribution of secure information about domnain names, via Domain Name System(DNS) itself. The DANE working group in the Internet Engineering Task Force(IETF) has developed a new type of DNS record called TLSA record that permits a domain itself to ratify statements about which organisations are empowered to represent or vouch for it. End users' applications can use thes records either to establish a new chain of trust, rooted in the DNS or to increase the existing system of Certificate Authorities.
+\subsubsection{TLS Authentication}
+The Transport Layer Security(TLS) protocol provides secure client-server connection for many internet applications[2]. In all of these internet applications, the server that the user in the end want to connect to is identified by a DNS domain name[7][8]. An internet user might enter https://example.de into a web browser or send an e.mail to jane@xample.de. So in this case th using the TLS  assures the user that the entity on the other far end of the connection actually represents example.de; that is to certify the server as a true representative of the domain name. It is also to be noted that these comments apply to Datagram Transport Layer Security(DTLS) due to the fact that it provides the same functions as TLS for User Datagram Protocol(UDP) packet flow.
+\subsubsection{The TLSA Resource Record(DANE Record)}
+The TLSA DNS resource record (RR) is used to match a TLS server certificate or public key with  the domain name where the record is found, thus forming a ''TLSA certificate association''[RFC-6698]. The DANE use cases document[RFC-6698] lays out four main types of statements that permit domain operators to define how clients should judge TLS certificate of their domains. These statements are:
+\begin{enumerate}
+\item CA Constraints: The client should only accept certifcates published under a specific CA.
+\item Service Certificate Constraints: The client should only accept specific certificates for specific services on a host.
+\item Trust anchor assertion: The client should use domain-provided trust anchors to validate certificates fo that domain. 
+\item Domain-issued Certificate Constraints: The client should only accept certificate issued by the domain name adminstrator itself.
+\end{enumerate}
+The major difference between the constraints 2. and 4. ist 2. requires that the certificate pass PKIX validation and 4. not.\\
+All the above statements can be seen as constraining the scope of trust anchors. The first, second and forth types limits the scope of existing trust anchors; the third type provides the client with a new trus anchor(but still within a limited scope).\\
+\indent The DANE TLSA resource record has four major fields:
+\begin{itemize}
+\item The Certificate Usage Field: This field specifies one of the above mentioned statement types(constraints) as the assoiation that will be used to match the certificate presented in the TLS handshake.
+\item The Selector Field: This field specifies which part of the TLS certificate presented by the server with be matched against the association data. That is, the full certificate or its SubjecPublicKeyInfo
+\item The Matching Type Field: This field specifies how the certificate association is matched. These types are: Exact match on, SHA-256 hash of and SHA-512 of  selected content[RFC-6234][RFC-6234].
+\item The Certificate Association Data Field: This field contains the actual data against which the TLS certificate chain should be matched.
+\end{itemize}
+\indent The DANE RR is stored under the target domain with a prefix that indicate the port number of the TLS server and the transport protocol on which a TLS-based service is assumed to exist.
+\indent TLSA RR Examples: if John runs a secure webservice at john.com and wants to  tell clients to only accept certificates from Jane's CA, he could supply  a TLSA record  under _44_tcp_john.com with following content:
+\begin{itemize}
+\item Usage: CA constraint
+\item Selector: full certificate
+\item Matching type: SHA-256
+\item Certificate for Association: SHA-256 of Jane's certificate
+\end{itemize}
+So when client Donald wants to connect to ''https://john.com'', he can find these TLSA RR and appy John's constraint when he validates the server'certificate.
+\subsubsection{Comparing DANE to Public CAs}
+\subsubsection{Transition Chanllenges}
+\subsubsection{Security Considerations}
+\subsection{The Perpertive Approach}
+\subsection{Name Constraint Approach}
